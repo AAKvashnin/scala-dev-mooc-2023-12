@@ -228,21 +228,6 @@ object opt {
       case None => None
     }
 
-    def printIfAny:Unit = this match {
-      case Some(v) => println(v)
-      case _ =>
-    }
-
-    def filter(predicate: T=>Boolean ):Option[T] = this match {
-      case Some(v) if(predicate(v)) => Some(v)
-      case None => None
-      case _ => None
-    }
-
-    def zip[A](that: Option[A]): Option[(T,A)] = (this, that) match {
-      case (Some(x), Some(y)) => Some((x,y))
-      case _ => None
-    }
 
   }
 
@@ -257,12 +242,12 @@ object opt {
 
   val o1: Option[Int] = Option(1)
   o1.isEmpty // false
-  o1.printIfAny //1
-  o1.filter(_>0) //Some(1)
-  o1.filter(_<0) //None
-  Option(1).zip(Option(2)) //Some(1,2)
-  None.zip(Option(1)) //None
-  Option(1).zip(None) //None
+  printIfAny(o1) //1
+  filter(o1,(x:Int)=>x>0) //Some(1)
+  filter(o1,(x:Int)=>x<0) //None
+  zip(Option(1),Option(2)) //Some(1,2)
+  zip(None,Option(1)) //None
+  zip(Option(1),None) //None
 
 
 
@@ -275,19 +260,33 @@ object opt {
    *
    * Реализовать метод printIfAny, который будет печатать значение, если оно есть
    */
+  def printIfAny[T](o:Option[T]): Unit = o match {
+    case Some(v) => println(v)
+    case _ =>
+  }
 
 
   /**
    *
    * Реализовать метод zip, который будет создавать Option от пары значений из 2-х Option
    */
-
+  def zip[A,B](o1: Option[A], o2:Option[B]): Option[(A, B)] = (o1, o2) match {
+    case (Some(x), Some(y)) => Some((x, y))
+    case _ => None
+  }
 
   /**
    *
    * Реализовать метод filter, который будет возвращать не пустой Option
    * в случае если исходный не пуст и предикат от значения = true
    */
+
+
+  def filter[T](o1:Option[T], predicate:T=>Boolean): Option[T] = o1 match {
+    case Some(v) if (predicate(v)) => Some(v)
+    case None => None
+    case _ => None
+  }
 
 }
 
@@ -322,10 +321,19 @@ object list {
    *
    */
 
+
   /**
    * Метод mkString возвращает строковое представление списка, с учетом переданного разделителя
    *
    */
+  def mkString[T](l:List[T], sep:String):String = {
+    l match {
+      case List.::(head,tail) => head.toString+sep+mkString(tail,sep)
+      case List.Nil => ""
+    }
+  }
+
+  mkString(l1,",")
 
   /**
    * Конструктор, позволяющий создать список из N - го числа аргументов
