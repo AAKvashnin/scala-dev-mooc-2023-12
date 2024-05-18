@@ -300,7 +300,10 @@ object list {
    */
 
   trait List[+T]{
-    def ::[TT >: T](elem: TT): List[TT] = ???
+    def ::[TT >: T](elem: TT): List[TT] = this match {
+      case _: List.::[TT] => elem :: this
+      case List.Nil => List[TT](elem)
+    }
   }
 
   object List{
