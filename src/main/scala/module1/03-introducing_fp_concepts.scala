@@ -301,8 +301,8 @@ object list {
 
   trait List[+T]{
     def ::[TT >: T](elem: TT): List[TT] = this match {
-      case _: List.::[TT] => elem :: this
-      case List.Nil => List[TT](elem)
+      case l: List.::[TT] => new  List.:: (elem, l)
+      case l: List.Nil.type => new List.::(elem,List.Nil)
     }
   }
 
@@ -331,12 +331,10 @@ object list {
    */
   def mkString[T](l:List[T], sep:String):String = {
     l match {
-      case List.::(head,tail) => head.toString+sep+mkString(tail,sep)
-      case List.Nil => ""
+      case List.::(head,tail)  =>  (head + sep + mkString(tail, sep)).stripSuffix(sep)
+      case List.Nil => "".toString
     }
   }
-
-  mkString(l1,",")
 
   /**
    * Конструктор, позволяющий создать список из N - го числа аргументов
