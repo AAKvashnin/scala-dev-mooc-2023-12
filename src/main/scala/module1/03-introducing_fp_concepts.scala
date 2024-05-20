@@ -323,6 +323,9 @@ object list {
    * Метод cons, добавляет элемент в голову списка, для этого метода можно воспользоваться названием `::`
    *
    */
+  def ::[T](list:List[T],elem:T):List[T] = {
+    elem :: list
+  }
 
 
   /**
@@ -343,28 +346,40 @@ object list {
    * Например вот этот метод принимает некую последовательность аргументов с типом Int и выводит их на печать
    * def printArgs(args: Int*) = args.foreach(println(_))
    */
-
+  def list[T](v: T*):List[T] = {
+    if (v.isEmpty) List.Nil else new List.::(v.head, list(v.tail: _*))
+  }
   /**
    *
    * Реализовать метод reverse который позволит заменить порядок элементов в списке на противоположный
    */
+  val l3=list[Int](1,2)
 
   /**
    *
    * Реализовать метод map для списка который будет применять некую ф-цию к элементам данного списка
    */
-
+   def map[A,B](l:List[A], f:A=>B):List[B] = {
+     l match {
+       case List.::(head,tail) => f(head) :: map(tail, f)
+       case List.Nil => List.Nil
+     }
+   }
 
   /**
    *
    * Реализовать метод filter для списка который будет фильтровать список по некому условию
    */
 
+
   /**
    *
    * Написать функцию incList котрая будет принимать список Int и возвращать список,
    * где каждый элемент будет увеличен на 1
    */
+   def incList(l:List[Int]):List[Int]={
+     map[Int,Int](l, (x:Int)=>x+1)
+   }
 
 
   /**
@@ -372,5 +387,8 @@ object list {
    * Написать функцию shoutString котрая будет принимать список String и возвращать список,
    * где к каждому элементу будет добавлен префикс в виде '!'
    */
+  def shoutString(l:List[String]):List[String]={
+    map(l, (x:String)=>"!".concat(x))
+  }
 
 }
