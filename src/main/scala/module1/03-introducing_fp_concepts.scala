@@ -339,6 +339,8 @@ object list {
     }
   }
 
+  mkString(l1,",")
+
   /**
    * Конструктор, позволяющий создать список из N - го числа аргументов
    * Для этого можно воспользоваться *
@@ -349,11 +351,20 @@ object list {
   def list[T](v: T*):List[T] = {
     if (v.isEmpty) List.Nil else new List.::(v.head, list(v.tail: _*))
   }
+
+  val l3=list[Int](1,2)
   /**
    *
    * Реализовать метод reverse который позволит заменить порядок элементов в списке на противоположный
    */
-  val l3=list[Int](1,2)
+
+  def reverse[A](l:List[A]):List[A] = {
+    def _reverse(res:List[A], rem:List[A]):List[A] = rem match {
+      case List.Nil => res
+      case List.::(head, tail) => _reverse(head :: res, tail)
+    }
+    _reverse(List.Nil, l)
+  }
 
   /**
    *
@@ -370,7 +381,15 @@ object list {
    *
    * Реализовать метод filter для списка который будет фильтровать список по некому условию
    */
+  def filter[A](l:List[A], predicate:A=>Boolean):List[A] = {
+    l match {
+      case List.::(head, tail) if predicate(head) =>  head :: filter[A](tail, predicate)
+      case List.::(head, tail) =>  filter[A](tail,predicate)
+      case List.Nil => List.Nil
+    }
 
+  }
+  
 
   /**
    *
@@ -380,7 +399,7 @@ object list {
    def incList(l:List[Int]):List[Int]={
      map[Int,Int](l, (x:Int)=>x+1)
    }
-
+  incList(l3)
 
   /**
    *
@@ -390,5 +409,8 @@ object list {
   def shoutString(l:List[String]):List[String]={
     map(l, (x:String)=>"!".concat(x))
   }
+
+  val l4=List("A","B","C")
+  shoutString(l4)
 
 }
