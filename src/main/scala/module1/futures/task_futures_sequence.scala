@@ -1,8 +1,10 @@
 package module1.futures
 
 import module1.futures.HomeworksUtils.TaskSyntax
+import org.scalatest.time.Seconds
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 object task_futures_sequence {
 
@@ -20,7 +22,15 @@ object task_futures_sequence {
    * @return асинхронную задачу с кортежом из двух списков
    */
   def fullSequence[A](futures: List[Future[A]])
-                     (implicit ex: ExecutionContext): Future[(List[A], List[Throwable])] =
-    task"Реализуйте метод `fullSequence`" ()
+                     (implicit ex: ExecutionContext): Future[(List[A], List[Throwable])] = {
+//    task"Реализуйте метод `fullSequence`" ()
+    val seq=Future.sequence(futures)
+    val result=Await.result(seq, scala.concurrent.duration.Duration.Inf)
+    val errors=futures.filter((f:Future[A])=>f.value.get.isFailure).map((f:Future[A])=>f.value.get.failed.get)
+    println(result)
+    println(errors)
+    Future( (result  ,errors)  )
+
+  }
 
 }
