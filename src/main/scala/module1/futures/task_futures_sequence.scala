@@ -3,8 +3,9 @@ package module1.futures
 import module1.futures.HomeworksUtils.TaskSyntax
 import org.scalatest.time.Seconds
 
-import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.util.{Failure, Success, Try}
+import scala.concurrent.duration.Duration
 
 object task_futures_sequence {
 
@@ -24,12 +25,20 @@ object task_futures_sequence {
   def fullSequence[A](futures: List[Future[A]])
                      (implicit ex: ExecutionContext): Future[(List[A], List[Throwable])] = {
 //    task"Реализуйте метод `fullSequence`" ()
-    val seq=Future.sequence(futures)
-    val result=Await.result(seq, scala.concurrent.duration.Duration.Inf)
-    val errors=futures.filter((f:Future[A])=>f.value.get.isFailure).map((f:Future[A])=>f.value.get.toEither.left.get)
-    println(result)
-    println(errors)
-    Future( (result  ,errors)  )
+
+    val initial:Future[(List[A],List[Throwable])]=Future((List(),List()))
+
+    val result:Future[(List[A],List[Throwable])]=futures.foldLeft(initial){ (accumulator, nextFuture) =>
+      accumulator.flatMap { case (successes, failures) =>
+        nextFuture.map(x=>Success(x)).recover(x=>Failure(x)).map
+          {
+          case Failure(exception)=>(successes, exception :: failures)
+          case Success(value)=>(value::successes, failures)
+        }
+      }
+    }
+
+    result.map(x=>(x._1.reverse, x._2.reverse))
 
   }
 
